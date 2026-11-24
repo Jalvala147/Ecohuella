@@ -41,7 +41,7 @@ En Consultar resultados individuales las cifras van resaltadas: fondo verde para
 ## Guía de uso en Windows
 
 1. Instala Python 3 desde [python.org](https://www.python.org/downloads/). En el instalador marca **Add python.exe to PATH**. Tkinter viene incluido con ese instalador; no hace falta instalarlo aparte.
-2. Descarga el repositorio: en GitHub usa **Download ZIP** y descomprime la carpeta, o clónalo con `git clone https://github.com/Jalvala147/Ecohuella.git`.
+2. Ten el archivo .zip del proyecto. Haz clic derecho sobre él, elige **Extraer todo** y abre la carpeta extraída que contiene `ecohuella.py`.
 3. Abre **cmd** en la carpeta del proyecto (la que contiene `ecohuella.py`) y ejecuta:
 
 ```bat
