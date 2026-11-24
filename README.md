@@ -38,6 +38,24 @@ Orden de uso: vivienda, habitantes, datos del recibo (kWh del bimestre y año) y
 
 En Consultar resultados individuales las cifras van resaltadas: fondo verde para el consumo individual y las huellas, fondo ámbar para el resultado de cada habitante, y una franja verde con el bimestre del recibo.
 
+## Guía de uso en Windows
+
+1. Instala Python 3 desde [python.org](https://www.python.org/downloads/). En el instalador marca **Add python.exe to PATH**. Tkinter viene incluido con ese instalador; no hace falta instalarlo aparte.
+2. Descarga el repositorio: en GitHub usa **Download ZIP** y descomprime la carpeta, o clónalo con `git clone https://github.com/Jalvala147/Ecohuella.git`.
+3. Abre **cmd** en la carpeta del proyecto (la que contiene `ecohuella.py`) y ejecuta:
+
+```bat
+python ecohuella.py
+```
+
+4. Si cmd responde que `python` no se reconoce como comando, usa el lanzador de Python:
+
+```bat
+py ecohuella.py
+```
+
+5. En la ventana, registra la vivienda, después los habitantes y el recibo (kWh del bimestre y año). Calcula la huella y, si quieres, consulta los resultados de cada recibo o compara los bimestres. Los datos solo duran mientras la ventana está abierta.
+
 ## Fórmulas
 
 - Consumo individual del bimestre: `Ci = Ct / N`
