@@ -1,4 +1,4 @@
-"""Vivienda: asocia habitantes y posee sus consumos eléctricos."""
+"""Vivienda: asocia habitantes y posee sus recibos de luz."""
 
 from consumo_electrico import ConsumoElectrico
 from persona import Persona
@@ -7,7 +7,7 @@ from persona import Persona
 class Vivienda:
     """Dirección del hogar.
 
-    Asociación: guarda las mismas Persona que registra la aplicación; no las crea ni las destruye.
+    Asociación: guarda las mismas Persona que crea la sesión; no las crea ni las destruye.
     Composición: los ConsumoElectrico viven en esta lista y desaparecen con la vivienda.
     """
 
@@ -24,8 +24,8 @@ class Vivienda:
         return self._direccion
 
     def agregar_habitante(self, persona: Persona) -> None:
-        if persona is None:
-            return
+        if not isinstance(persona, Persona):
+            raise TypeError("Se esperaba una Persona.")
         self._habitantes.append(persona)
 
     def quitar_habitante(self, persona: Persona) -> None:
@@ -43,17 +43,17 @@ class Vivienda:
         return tuple(self._habitantes)
 
     def agregar_consumo(self, consumo: ConsumoElectrico) -> None:
-        ok, motivo = consumo.es_valido()
-        if not ok:
-            raise ValueError(motivo)
+        if not isinstance(consumo, ConsumoElectrico):
+            raise TypeError("Se esperaba un ConsumoElectrico.")
+        consumo.validar()
         for existente in self._consumos:
-            if existente.mes == consumo.mes and existente.anio == consumo.anio:
-                raise ValueError("Ya existe un consumo registrado para ese mes y año.")
+            if existente.mismo_periodo(consumo):
+                raise ValueError("Ya existe un recibo registrado para ese bimestre y año.")
         self._consumos.append(consumo)
 
     def quitar_consumo(self, indice: int) -> None:
         if indice < 0 or indice >= len(self._consumos):
-            raise ValueError("No hay un consumo en esa posición.")
+            raise ValueError("No hay un recibo en esa posición.")
         del self._consumos[indice]
 
     @property
@@ -62,27 +62,37 @@ class Vivienda:
 
     def comparar_consumos(self, promedio_kwh: float) -> str:
         if len(self._consumos) < 2:
-            return "Se necesitan al menos dos consumos mensuales para comparar."
+            return "Se necesitan al menos dos recibos bimestrales para comparar."
 
-        ordenados = sorted(self._consumos, key=lambda consumo: (consumo.anio, consumo.mes))
+        ordenados = sorted(self._consumos, key=lambda consumo: (consumo.anio, consumo.bimestre))
         referencia = f"{promedio_kwh:.0f}"
         lineas = [
-            f"Comparación de consumos mensuales (promedio residencial: {referencia} kWh/mes):"
+            f"Comparación de consumos bimestrales (promedio del recibo: {referencia} kWh/bimestre):"
         ]
-        for indice, actual in enumerate(ordenados):
-            diferencia_promedio = actual.kwh - promedio_kwh
-            texto = actual.resumen()
-            if indice > 0:
-                delta = actual.kwh - ordenados[indice - 1].kwh
-                texto += (
-                    f" ({delta:+.2f} kWh respecto al mes anterior; "
-                    f"{diferencia_promedio:+.2f} kWh frente al promedio)"
-                )
-            else:
-                texto += f" ({diferencia_promedio:+.2f} kWh frente al promedio)"
-            if actual.kwh > promedio_kwh:
-                texto += " - por encima del promedio"
-            else:
-                texto += " - en o por debajo del promedio"
-            lineas.append(texto)
+        anterior: ConsumoElectrico | None = None
+        for actual in ordenados:
+            lineas.append(self._describir_contra_promedio(actual, promedio_kwh, anterior))
+            anterior = actual
         return "\n".join(lineas)
+
+    def _describir_contra_promedio(
+        self,
+        actual: ConsumoElectrico,
+        promedio_kwh: float,
+        anterior: ConsumoElectrico | None,
+    ) -> str:
+        diferencia = actual.kwh - promedio_kwh
+        texto = actual.resumen()
+        if anterior is None:
+            texto += f" ({diferencia:+.2f} kWh frente al promedio)"
+        else:
+            delta = actual.kwh - anterior.kwh
+            texto += (
+                f" ({delta:+.2f} kWh respecto al bimestre anterior; "
+                f"{diferencia:+.2f} kWh frente al promedio)"
+            )
+        if actual.kwh > promedio_kwh:
+            texto += " - por encima del promedio"
+        else:
+            texto += " - en o por debajo del promedio"
+        return texto

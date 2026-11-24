@@ -1,10 +1,45 @@
-"""Resultado guardado de una huella ya calculada."""
+"""Resultado de una huella ya calculada para un recibo bimestral."""
 
-from consumo_electrico import describir_periodo
+from bimestre import Bimestre
+
+
+class LineaInforme:
+    """Una línea del informe y el papel que cumple al mostrarla.
+
+    El módulo de resultados usa el papel para resaltar las cifras.
+    """
+
+    ENCABEZADO = "encabezado"
+    CONTEXTO = "contexto"
+    RESULTADO = "resultado"
+    ETIQUETA = "etiqueta"
+    PERSONA = "persona"
+    TITULO_RECOMENDACION = "titulo_recomendacion"
+    RECOMENDACION = "recomendacion"
+    ERROR = "error"
+    AVISO = "aviso"
+    SEPARADOR = "separador"
+
+    def __init__(self, texto: str, rol: str) -> None:
+        self._texto = texto
+        self._rol = rol
+
+    @property
+    def texto(self) -> str:
+        return self._texto
+
+    @property
+    def rol(self) -> str:
+        return self._rol
 
 
 class Resultado:
-    """kg CO2e, consumo individual y el contexto para mostrarlo."""
+    """kg CO2e, consumo individual y el contexto para mostrarlo.
+
+    Guarda copias de los datos usados en el cálculo. No conserva la Persona
+    ni el FactorEmision: si después cambian los habitantes, este objeto
+    sigue describiendo el cálculo que lo produjo.
+    """
 
     def __init__(
         self,
@@ -12,7 +47,7 @@ class Resultado:
         consumo_individual: float,
         consumo_total: float,
         direccion: str,
-        mes: int,
+        bimestre: Bimestre,
         anio: int,
         habitantes: int,
         factor: float,
@@ -23,7 +58,7 @@ class Resultado:
         self._consumo_individual = float(consumo_individual)
         self._consumo_total = float(consumo_total)
         self._direccion = direccion
-        self._mes = int(mes)
+        self._bimestre = Bimestre(bimestre.numero)
         self._anio = int(anio)
         self._habitantes = int(habitantes)
         self._factor = float(factor)
@@ -47,8 +82,8 @@ class Resultado:
         return self._direccion
 
     @property
-    def mes(self) -> int:
-        return self._mes
+    def bimestre(self) -> Bimestre:
+        return self._bimestre
 
     @property
     def anio(self) -> int:
@@ -72,28 +107,49 @@ class Resultado:
 
     def resumen(self) -> str:
         return (
-            f"{self.direccion} | {describir_periodo(self.mes, self.anio)}"
+            f"{self.direccion} | {self.bimestre.describir(self.anio)}"
             f" | N={self.habitantes}"
             f" | Ci={self.consumo_individual:.2f} kWh"
             f" | HC={self.kg_co2:.2f} kg CO2e"
         )
 
-    def mostrar(self) -> str:
+    def partes(self) -> tuple[LineaInforme, ...]:
+        """Líneas del resultado. El rol dice cuáles son las cifras a resaltar."""
         huella_vivienda = self.consumo_total * self.factor
         lineas = [
-            f"Vivienda: {self.direccion}",
-            f"Periodo: {describir_periodo(self.mes, self.anio)}",
-            f"Consumo total (Ct): {self.consumo_total:.2f} kWh",
-            f"Habitantes (N): {self.habitantes}",
-            f"Consumo individual (Ci = Ct / N): {self.consumo_individual:.2f} kWh",
-            f"Factor de emisión (FE): {self.factor:.3f} kg CO2e/kWh ({self.anio_factor})",
-            f"Huella individual (HC = Ci * FE): {self.kg_co2:.2f} kg CO2e",
-            f"Huella de la vivienda (Ct * FE): {huella_vivienda:.2f} kg CO2e",
-            "Resultado por habitante:",
+            LineaInforme(f"Vivienda: {self.direccion}", LineaInforme.CONTEXTO),
+            LineaInforme(f"Recibo: {self.bimestre.describir(self.anio)}", LineaInforme.CONTEXTO),
+            LineaInforme(f"Consumo del recibo (Ct): {self.consumo_total:.2f} kWh", LineaInforme.CONTEXTO),
+            LineaInforme(f"Habitantes (N): {self.habitantes}", LineaInforme.CONTEXTO),
+            LineaInforme(
+                f"Consumo individual (Ci = Ct / N): {self.consumo_individual:.2f} kWh",
+                LineaInforme.RESULTADO,
+            ),
+            LineaInforme(
+                f"Factor de emisión (FE): {self.factor:.3f} kg CO2e/kWh ({self.anio_factor})",
+                LineaInforme.CONTEXTO,
+            ),
+            LineaInforme(
+                f"Huella individual del bimestre (HC = Ci * FE): {self.kg_co2:.2f} kg CO2e",
+                LineaInforme.RESULTADO,
+            ),
+            LineaInforme(
+                f"Huella de la vivienda en el bimestre (Ct * FE): {huella_vivienda:.2f} kg CO2e",
+                LineaInforme.RESULTADO,
+            ),
+            LineaInforme("Resultado por habitante:", LineaInforme.ETIQUETA),
         ]
         if not self.nombres:
-            lineas.append("- (sin nombres registrados)")
+            lineas.append(LineaInforme("(sin nombres registrados)", LineaInforme.CONTEXTO))
         else:
             for nombre in self.nombres:
-                lineas.append(f"- {nombre}: {self.consumo_individual:.2f} kWh, {self.kg_co2:.2f} kg CO2e")
-        return "\n".join(lineas)
+                lineas.append(
+                    LineaInforme(
+                        f"{nombre}: {self.consumo_individual:.2f} kWh, {self.kg_co2:.2f} kg CO2e",
+                        LineaInforme.PERSONA,
+                    )
+                )
+        return tuple(lineas)
+
+    def mostrar(self) -> str:
+        return "\n".join(linea.texto for linea in self.partes())

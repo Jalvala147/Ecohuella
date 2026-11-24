@@ -1,7 +1,8 @@
-"""Cálculo de la huella individual. Recibe los objetos (en Python, por referencia)."""
+"""Cálculo de la huella individual a partir del recibo bimestral."""
 
 import math
 
+from bimestre import Bimestre
 from consumo_electrico import ConsumoElectrico
 from factor_emision import FactorEmision
 from resultado import Resultado
@@ -9,11 +10,16 @@ from vivienda import Vivienda
 
 # Promedio residencial de referencia en México: 167 kWh/mes
 # (consumo anual típico de aproximadamente 2000 kWh; 2000/12 da cerca de 167).
+# El recibo de luz cubre un bimestre, así que la comparación usa 167 * Bimestre.MESES.
 PROMEDIO_RESIDENCIAL_MEXICO_KWH = 167.0
 
 
 class CalculadoraHuella:
-    """Ci = Ct / N y HC = Ci * FE. No divide si N es 0 o los kWh no son válidos."""
+    """Ci = Ct / N y HC = Ci * FE. Ct es el kWh del recibo bimestral.
+
+    No divide si N es 0 o los kWh no son válidos. No guarda estado:
+    cada cálculo recibe la vivienda, el recibo y el factor.
+    """
 
     def calcular(
         self,
@@ -21,10 +27,7 @@ class CalculadoraHuella:
         consumo: ConsumoElectrico,
         factor: FactorEmision,
     ) -> Resultado:
-        ok, motivo = consumo.es_valido()
-        if not ok:
-            raise ValueError(motivo)
-
+        consumo.validar()
         habitantes = vivienda.numero_habitantes()
         if habitantes == 0:
             raise ValueError(
@@ -41,7 +44,7 @@ class CalculadoraHuella:
             consumo_individual,
             consumo.kwh,
             vivienda.direccion,
-            consumo.mes,
+            consumo.bimestre,
             consumo.anio,
             habitantes,
             factor.valor,
@@ -52,15 +55,21 @@ class CalculadoraHuella:
     def promedio_residencial_kwh(self) -> float:
         return PROMEDIO_RESIDENCIAL_MEXICO_KWH
 
+    def promedio_bimestral_kwh(self) -> float:
+        return self.promedio_residencial_kwh() * Bimestre.MESES
+
     def recomendar(self, resultado: Resultado) -> str:
-        promedio = self.promedio_residencial_kwh()
+        promedio = self.promedio_bimestral_kwh()
+        mensual = self.promedio_residencial_kwh()
         consumo = f"{resultado.consumo_total:.2f}"
         referencia = f"{promedio:.0f}"
+        base = f"{mensual:.0f}"
         if resultado.consumo_total > promedio:
             return (
                 "Recomendaciones de uso:\n"
-                f"El consumo mensual de la vivienda ({consumo} kWh) supera el promedio "
-                f"residencial en México de {referencia} kWh/mes (unos 2000 kWh al año).\n"
+                f"El consumo del recibo ({consumo} kWh en el bimestre) supera el promedio "
+                f"residencial en México de {referencia} kWh por bimestre "
+                f"({base} kWh/mes, unos 2000 kWh al año).\n"
                 "- Iluminación LED: cambia focos incandescentes o fluorescentes.\n"
                 "- Aire acondicionado: fíjalo cerca de 25 C y apágalo si la habitación queda vacía.\n"
                 "- Standby: desconecta equipos que siguen consumiendo apagados.\n"
@@ -69,8 +78,9 @@ class CalculadoraHuella:
             )
         return (
             "Recomendaciones de uso:\n"
-            f"El consumo mensual de la vivienda ({consumo} kWh) está en o por debajo del "
-            f"promedio residencial en México de {referencia} kWh/mes (unos 2000 kWh al año).\n"
+            f"El consumo del recibo ({consumo} kWh en el bimestre) está en o por debajo del "
+            f"promedio residencial en México de {referencia} kWh por bimestre "
+            f"({base} kWh/mes, unos 2000 kWh al año).\n"
             "Mantener estos hábitos conserva la huella baja:\n"
             "- Sigue con iluminación LED.\n"
             "- Mantén moderado el aire acondicionado.\n"
