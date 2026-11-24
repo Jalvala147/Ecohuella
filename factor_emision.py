@@ -2,7 +2,10 @@
 
 import math
 
-# Factor de emisión de referencia: 0.444 kg CO2e/kWh (México, 2024).
+# Factor de emisión del Sistema Eléctrico Nacional 2024: 0.444 tCO2e/MWh = 0.444 kg CO2e/kWh.
+# Fuente: SEMARNAT, "Aviso. Factor de emisión del Sistema Eléctrico Nacional 2024" (28 de febrero de 2025):
+# https://www.gob.mx/cms/uploads/attachment/file/981194/aviso_fesen_2024.pdf
+# Es el más reciente publicado: el aviso de SEMARNAT para la COA 2026 indica seguir usando 0.444.
 FACTOR_MEXICO_2024 = 0.444
 ANIO_FACTOR_MEXICO = 2024
 

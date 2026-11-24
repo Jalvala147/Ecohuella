@@ -14,7 +14,7 @@ Variables, tipos y relaciones del programa. Los datos viven en memoria mientras 
 | --- | --- | --- | --- | --- |
 | Sesion | composición | Vivienda | 0..1 | La sesión crea la vivienda y la reemplaza. Al registrar otra, la anterior deja de usarse. |
 | Sesion | composición | Persona | 0..* | La sesión crea a los habitantes y los conserva en su lista. |
-| Sesion | composición | FactorEmision | 1 | Un factor para toda la sesión. Valor inicial 0.444, año 2024. |
+| Sesion | composición | FactorEmision | 1 | Un factor para toda la sesión. Valor inicial 0.444, año 2024 (SEMARNAT, factor del SEN 2024). |
 | Sesion | composición | CalculadoraHuella | 1 | La calculadora no guarda datos; la sesión la posee para hacer las cuentas. |
 | Sesion | crea y entrega | ConsumoElectrico | 0..* | El recibo se construye en la sesión y pasa a ser parte de la vivienda. La sesión no guarda otra lista. |
 | Sesion | produce | LineaInforme | 0..* | Arma el informe que pinta Consultar resultados individuales. |
@@ -27,7 +27,7 @@ Variables, tipos y relaciones del programa. Los datos viven en memoria mientras 
 | Resultado | produce | LineaInforme | 1..* | `partes` describe el resultado línea por línea. |
 | CalculadoraHuella | dependencia | Vivienda, ConsumoElectrico, FactorEmision | usa | Los recibe por parámetro y no los conserva. |
 | CalculadoraHuella | crea | Resultado | 1 por cálculo | Devuelve el objeto y no lo almacena. |
-| CalculadoraHuella | dependencia | Bimestre | usa `MESES` | El promedio del recibo es 167 kWh/mes × `Bimestre.MESES`. |
+| CalculadoraHuella | dependencia | Bimestre | usa `MESES` | El promedio del recibo es 154.85 kWh/mes × `Bimestre.MESES` = 309.71 kWh. |
 | Aplicacion | composición | Sesion | 1 | La ventana no calcula: delega en la sesión. |
 | Aplicacion | composición | PanelSeccion | 6 | Una instancia de cada pantalla del menú. |
 | PanelSeccion | herencia | PanelVivienda, PanelHabitantes, PanelConsumo, PanelCalcular, PanelResultados, PanelComparar | 6 subclases | Comparten título, campos y botones. |
@@ -47,7 +47,9 @@ No hay subclases en el dominio. `Persona` no se hereda: todos los habitantes cue
 | factor_emision | ANIO_FACTOR_MEXICO | int | valor inicial de FactorEmision | 2024. |
 | FactorEmision | _factor | float | atributo propio | Kilogramos de CO2e por cada kWh. Se lee con `valor`. |
 | FactorEmision | _anio | int | atributo propio | Año del factor. Se lee con `anio`. |
-| calculadora_huella | PROMEDIO_RESIDENCIAL_MEXICO_KWH | float | lo usa CalculadoraHuella | 167.0 kWh/mes. Referencia de unos 2000 kWh al año. |
+| calculadora_huella | CONSUMO_ANUAL_VIVIENDA_MEXICO_KWH | float | lo usa CalculadoraHuella | 1858.24 kWh por vivienda al año (CONUEE, BIEE 2019). |
+| calculadora_huella | PROMEDIO_RESIDENCIAL_MEXICO_KWH | float | lo usa CalculadoraHuella | 1858.24 / 12 = 154.85 kWh/mes. |
+| calculadora_huella | OCUPANTES_PROMEDIO_VIVIENDA_MEXICO | float | lo usa CalculadoraHuella | 3.6 ocupantes por vivienda (INEGI, Censo 2020). Sirve para la huella promedio por persona. |
 | CalculadoraHuella | (sin atributos) | — | dependencia de los objetos que recibe | No guarda vivienda, recibo ni factor. |
 | Bimestre | MESES | int | lo usa CalculadoraHuella | 2. Meses que cubre un recibo. |
 | Bimestre | _PERIODOS | tuple[tuple[int, int, str], ...] | catálogo de la clase | Seis bimestres: mes inicial, mes final y nombre. |
@@ -110,7 +112,7 @@ No hay subclases en el dominio. `Persona` no se hereda: todos los habitantes cue
 | PanelCalcular | tabla | Tabla | muestra Vivienda.consumos | El recibo elegido es el que se calcula. |
 | PanelCalcular | caja | CajaTexto | muestra Resultado y la recomendación | Texto plano, sin los resaltes del otro módulo. |
 | PanelResultados | caja | CajaResultados | muestra LineaInforme | Verde: Ci, HC individual y huella de la vivienda. Ámbar: cada habitante. Franja verde: el recibo. |
-| PanelComparar | caja | CajaTexto | muestra Vivienda.comparar_consumos | Diferencias entre recibos y el promedio de 334 kWh/bimestre. |
+| PanelComparar | caja | CajaTexto | muestra Vivienda.comparar_consumos | Diferencias entre recibos y el promedio de 309.71 kWh/bimestre. |
 | Tabla | arbol | ttk.Treeview | muestra una colección | La fila `i` corresponde al elemento `i` de la tupla. |
 | CajaTexto | texto | tk.Text | muestra un str | Solo lectura. |
 | BarraEstado | text, fg | str | muestra el aviso | `fg` es VERDE o ERROR. El widget es la propia barra. |
