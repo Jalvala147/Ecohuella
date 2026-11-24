@@ -4,7 +4,7 @@ Sistema de cálculo y monitoreo de huella de carbono individual mediante el cons
 
 El consumo se captura como el recibo de luz: un bimestre (dos meses) y los kWh totales de ese recibo.
 
-El detalle de atributos, tipos y relaciones está en [MODELO.md](MODELO.md).
+El detalle de atributos, tipos y relaciones está en [MODELO.md](MODELO.md). El diccionario de clases, con responsabilidad, atributos, métodos y relaciones, está en [DICCIONARIO_CLASES.md](DICCIONARIO_CLASES.md).
 
 ## Requisitos
 
