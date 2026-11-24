@@ -4,6 +4,8 @@ Catálogo de las clases del modelo. Cada ficha dice para qué existe la clase, q
 
 Visibilidad: `+` público, `-` privado (el nombre empieza con `_`). En Python el guion bajo es una convención: desde fuera se usan las propiedades y los métodos públicos.
 
+En cada clase, los elementos van en orden alfabético por su nombre, sin tomar en cuenta el guion bajo. Si un atributo y su propiedad se llaman igual, el atributo va primero.
+
 Tipos de relación:
 
 | Relación | Significado en este programa |
@@ -39,21 +41,21 @@ Periodo bimestral del 1 (enero-febrero) al 6 (noviembre-diciembre). Dos bimestre
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| + | MESES | int | 2. Meses que cubre cualquier recibo. |
-| - | _PERIODOS | tuple[tuple[int, int, str], ...] | Catálogo: mes inicial, mes final y nombre. |
-| - | _numero | int | Número del 1 al 6. |
-| + | numero() | int | Devuelve `_numero`. |
-| + | mes_inicio() | int | Primer mes, leído del catálogo. |
-| + | mes_fin() | int | Segundo mes, leído del catálogo. |
-| + | nombre() | str | Por ejemplo `marzo-abril`. |
 | + | describir(anio: int) | str | Nombre del bimestre más el año. |
-| + | opcion() | str | Texto del formulario, por ejemplo `2 - marzo-abril`. |
+| + | desde_texto(texto: str) | Bimestre o None | Lee la opción del formulario. Método de clase. |
 | + | __eq__(otro) | bool | Igual si el número coincide. |
 | + | __hash__() | int | Permite usar el bimestre en conjuntos. |
 | + | __lt__(otro: Bimestre) | bool | Ordena del bimestre 1 al 6. |
-| + | todos() | tuple[Bimestre, ...] | Los seis bimestres. Método de clase. |
+| + | mes_fin() | int | Segundo mes, leído del catálogo. |
+| + | mes_inicio() | int | Primer mes, leído del catálogo. |
+| + | MESES | int | 2. Meses que cubre cualquier recibo. |
+| + | nombre() | str | Por ejemplo `marzo-abril`. |
+| - | _numero | int | Número del 1 al 6. |
+| + | numero() | int | Devuelve `_numero`. |
+| + | opcion() | str | Texto del formulario, por ejemplo `2 - marzo-abril`. |
 | + | opciones() | tuple[str, ...] | Textos para el combo. Método de clase. |
-| + | desde_texto(texto: str) | Bimestre o None | Lee la opción del formulario. Método de clase. |
+| - | _PERIODOS | tuple[tuple[int, int, str], ...] | Catálogo: mes inicial, mes final y nombre. |
+| + | todos() | tuple[Bimestre, ...] | Los seis bimestres. Método de clase. |
 
 Relación: valor independiente. `ConsumoElectrico` y `Resultado` componen cada uno el suyo.
 
@@ -63,14 +65,14 @@ Habitante. No tiene subtipos: todos entran igual en N.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _nombre | str | Nombre, sin espacios de más. |
 | - | _edad | int | Entero entre 0 y 130. |
+| + | edad() | int | Devuelve `_edad`. |
 | - | _identificacion | str | Identificación, sin espacios de más. |
+| + | identificacion() | str | Devuelve `_identificacion`. |
 | + | __init__(nombre, edad, identificacion) | — | Rechaza nombre vacío, edad fuera de rango o identificación vacía. |
-| + | nombre() | str | |
-| + | edad() | int | |
-| + | identificacion() | str | |
 | + | mostrar() | str | Texto con nombre, edad e identificación. |
+| - | _nombre | str | Nombre, sin espacios de más. |
+| + | nombre() | str | Devuelve `_nombre`. |
 
 Relación: `Sesion` la crea y la guarda (composición de la lista). `Vivienda` guarda la misma instancia (asociación).
 
@@ -80,21 +82,21 @@ Dirección del hogar.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _direccion | str | Dirección. No puede quedar vacía. |
-| - | _habitantes | list[Persona] | Asociación. La vivienda no crea ni destruye a las personas. |
-| - | _consumos | list[ConsumoElectrico] | Composición. Los recibos viven aquí. |
-| + | __init__(direccion: str) | — | Recorta la dirección y exige que tenga texto. |
-| + | direccion() | str | |
-| + | agregar_habitante(persona: Persona) | None | Asocia la misma instancia. |
-| + | quitar_habitante(persona: Persona) | None | Quita esa instancia de la lista. |
-| + | desasociar_habitantes() | None | Vacía la asociación. Las personas siguen fuera. |
-| + | numero_habitantes() | int | N. |
-| + | habitantes() | tuple[Persona, ...] | Copia de solo lectura de la lista. |
 | + | agregar_consumo(consumo: ConsumoElectrico) | None | Valida el recibo y no admite el mismo bimestre y año dos veces. |
-| + | quitar_consumo(indice: int) | None | Borra el recibo de esa posición. |
-| + | consumos() | tuple[ConsumoElectrico, ...] | Copia de solo lectura. |
+| + | agregar_habitante(persona: Persona) | None | Asocia la misma instancia. |
 | + | comparar_consumos(promedio_kwh: float) | str | Diferencia entre recibos, ordenados por año y bimestre. |
+| - | _consumos | list[ConsumoElectrico] | Composición. Los recibos viven aquí. |
+| + | consumos() | tuple[ConsumoElectrico, ...] | Copia de solo lectura. |
+| + | desasociar_habitantes() | None | Vacía la asociación. Las personas siguen fuera. |
 | - | _describir_contra_promedio(actual, promedio_kwh, anterior) | str | Una línea de esa comparación. |
+| - | _direccion | str | Dirección. No puede quedar vacía. |
+| + | direccion() | str | Devuelve `_direccion`. |
+| - | _habitantes | list[Persona] | Asociación. La vivienda no crea ni destruye a las personas. |
+| + | habitantes() | tuple[Persona, ...] | Copia de solo lectura de la lista. |
+| + | __init__(direccion: str) | — | Recorta la dirección y exige que tenga texto. |
+| + | numero_habitantes() | int | N. |
+| + | quitar_consumo(indice: int) | None | Borra el recibo de esa posición. |
+| + | quitar_habitante(persona: Persona) | None | Quita esa instancia de la lista. |
 
 Relaciones: asociación 0..* con `Persona`. Composición 0..* con `ConsumoElectrico`.
 
@@ -104,17 +106,17 @@ Datos de un recibo de luz.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _kwh | float | Consumo del bimestre. Debe ser mayor que cero. |
-| - | _bimestre | Bimestre | Composición. El periodo es parte del recibo. |
 | - | _anio | int | Año, entre 1990 y 2100. |
+| + | anio() | int | Devuelve `_anio`. |
+| - | _bimestre | Bimestre | Composición. El periodo es parte del recibo. |
+| + | bimestre() | Bimestre | Devuelve `_bimestre`. |
 | + | __init__(kwh, bimestre, anio) | — | Exige un número, un Bimestre y un año entero. |
-| + | kwh() | float | |
-| + | bimestre() | Bimestre | |
-| + | anio() | int | |
-| + | validar() | None | Lanza error si los kWh o el año no sirven. |
+| - | _kwh | float | Consumo del bimestre. Debe ser mayor que cero. |
+| + | kwh() | float | Devuelve `_kwh`. |
 | + | mismo_periodo(otro: ConsumoElectrico) | bool | Mismo bimestre y mismo año. |
 | + | periodo() | str | Texto del bimestre con el año. |
 | + | resumen() | str | Periodo y kWh. |
+| + | validar() | None | Lanza error si los kWh o el año no sirven. |
 
 Relación: composición de `Vivienda`. Compone un `Bimestre`. `CalculadoraHuella` lo usa y no lo guarda.
 
@@ -124,12 +126,12 @@ Kilogramos de CO2e por cada kWh. El valor inicial es 0.444, México 2024.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _factor | float | FE. Se lee con `valor`. |
-| - | _anio | int | Año de ese factor. |
-| + | __init__(factor=0.444, anio=2024) | — | |
-| + | valor() | float | |
-| + | anio() | int | |
 | + | actualizar(factor: float, anio: int) | None | Cambia el factor si es mayor que cero y el año está entre 1990 y 2100. |
+| - | _anio | int | Año de ese factor. |
+| + | anio() | int | Devuelve `_anio`. |
+| - | _factor | float | FE. Se lee con `valor`. |
+| + | __init__(factor=0.444, anio=2024) | — | Valor inicial 0.444, año 2024. |
+| + | valor() | float | Devuelve `_factor`. |
 
 Relación: composición de `Sesion`. `CalculadoraHuella` lo recibe y copia el número dentro de `Resultado`; el resultado no guarda este objeto.
 
@@ -140,8 +142,8 @@ Hace `Ci = Ct / N` y `HC = Ci * FE`. Ct es el kWh del recibo. No divide si N es 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
 | + | calcular(vivienda, consumo, factor) | Resultado | Crea el resultado del recibo. |
-| + | promedio_residencial_kwh() | float | 167 kWh/mes. |
 | + | promedio_bimestral_kwh() | float | 167 × `Bimestre.MESES`, o sea 334 kWh por recibo. |
+| + | promedio_residencial_kwh() | float | 167 kWh/mes. |
 | + | recomendar(resultado: Resultado) | str | Hábitos según el recibo esté sobre o bajo 334 kWh. |
 
 Relaciones: depende de `Vivienda`, `ConsumoElectrico`, `FactorEmision` y `Bimestre`. Crea un `Resultado` y no lo almacena.
@@ -152,21 +154,30 @@ Copia de un cálculo ya hecho. Si después cambian los habitantes o el factor, e
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _kg_co2 | float | HC, huella individual del bimestre. |
-| - | _consumo_individual | float | Ci. |
-| - | _consumo_total | float | Ct del recibo. |
-| - | _direccion | str | Copia de la dirección. |
-| - | _bimestre | Bimestre | Copia del periodo. Composición. |
 | - | _anio | int | Año del recibo. |
-| - | _habitantes | int | N usado al dividir. |
-| - | _factor | float | Copia del FE. No es el objeto FactorEmision. |
+| + | anio() | int | Devuelve `_anio`. |
 | - | _anio_factor | int | Año de ese FE. |
-| - | _nombres | tuple[str, ...] | Nombres copiados. No hay enlace a Persona. |
+| + | anio_factor() | int | Devuelve `_anio_factor`. |
+| - | _bimestre | Bimestre | Copia del periodo. Composición. |
+| + | bimestre() | Bimestre | Devuelve `_bimestre`. |
+| - | _consumo_individual | float | Ci. |
+| + | consumo_individual() | float | Devuelve `_consumo_individual`. |
+| - | _consumo_total | float | Ct del recibo. |
+| + | consumo_total() | float | Devuelve `_consumo_total`. |
+| - | _direccion | str | Copia de la dirección. |
+| + | direccion() | str | Devuelve `_direccion`. |
+| - | _factor | float | Copia del FE. No es el objeto FactorEmision. |
+| + | factor() | float | Devuelve `_factor`. |
+| - | _habitantes | int | N usado al dividir. |
+| + | habitantes() | int | Devuelve `_habitantes`. |
 | + | __init__(...) | — | Recibe las cifras y el contexto, y copia el bimestre. |
-| + | kg_co2(), consumo_individual(), consumo_total(), direccion(), bimestre(), anio(), habitantes(), factor(), anio_factor(), nombres() | el tipo de cada atributo | Lectura de la copia. |
-| + | resumen() | str | Una línea: dirección, periodo, N, Ci y HC. |
+| - | _kg_co2 | float | HC, huella individual del bimestre. |
+| + | kg_co2() | float | Devuelve `_kg_co2`. |
+| + | mostrar() | str | Une las líneas de `partes` en un solo texto. |
+| - | _nombres | tuple[str, ...] | Nombres copiados. No hay enlace a Persona. |
+| + | nombres() | tuple[str, ...] | Devuelve `_nombres`. |
 | + | partes() | tuple[LineaInforme, ...] | Reparte el texto en líneas con rol. |
-| + | mostrar() | str | Une esas líneas en un solo texto. |
+| + | resumen() | str | Una línea: dirección, periodo, N, Ci y HC. |
 
 Relaciones: compone un `Bimestre`. Produce `LineaInforme`. No asocia `Persona` ni `FactorEmision`.
 
@@ -176,12 +187,21 @@ Una línea del informe y el papel que cumple al pintarla. El rol decide el resal
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| + | ENCABEZADO, CONTEXTO, RESULTADO, ETIQUETA, PERSONA, TITULO_RECOMENDACION, RECOMENDACION, ERROR, AVISO, SEPARADOR | str | Constantes de clase. `RESULTADO` y `PERSONA` son las cifras resaltadas. |
+| + | AVISO | str | Falta la vivienda o faltan recibos. |
+| + | CONTEXTO | str | Vivienda, recibo, Ct, N y FE. |
+| + | ENCABEZADO | str | Título del recibo. |
+| + | ERROR | str | Motivo por el que no se pudo calcular. |
+| + | ETIQUETA | str | Rótulo «Resultado por habitante». |
+| + | __init__(texto: str, rol: str) | — | Guarda el texto y el rol. |
+| + | PERSONA | str | Resultado de cada habitante. |
+| + | RECOMENDACION | str | Hábitos sugeridos. |
+| + | RESULTADO | str | Ci y las huellas. |
+| - | _rol | str | Una de las constantes de rol. |
+| + | rol() | str | Devuelve `_rol`. |
+| + | SEPARADOR | str | Línea en blanco entre bloques. |
 | - | _texto | str | Texto visible. |
-| - | _rol | str | Una de esas constantes. |
-| + | __init__(texto: str, rol: str) | — | |
-| + | texto() | str | |
-| + | rol() | str | |
+| + | texto() | str | Devuelve `_texto`. |
+| + | TITULO_RECOMENDACION | str | Título de las recomendaciones. |
 
 Relación: la crean `Resultado.partes` y `Sesion`. La ventana solo la lee para pintar.
 
@@ -191,28 +211,28 @@ Dueña del estado mientras la ventana está abierta. No escribe archivos.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
-| - | _personas | list[Persona] | Composición. La sesión crea a los habitantes. |
-| - | _vivienda | Vivienda o None | Composición. None hasta el primer registro. |
-| - | _factor | FactorEmision | Composición. Uno para toda la sesión. |
-| - | _calculadora | CalculadoraHuella | Composición. Servicio sin memoria. |
-| + | __init__() | — | Crea factor y calculadora. Aún no hay vivienda. |
-| + | vivienda() | Vivienda o None | |
-| + | factor() | FactorEmision | |
-| + | calculadora() | CalculadoraHuella | |
-| + | personas() | tuple[Persona, ...] | |
-| + | exigir_vivienda() | Vivienda | Error si todavía no hay vivienda. |
-| + | registrar_vivienda(direccion: str) | bool | True si reemplazó a otra. Valida la dirección antes de borrar lo ya capturado. |
 | + | agregar_habitante(nombre, edad, identificacion) | Persona | Crea la persona y la asocia a la vivienda. |
+| - | _calculadora | CalculadoraHuella | Composición. Servicio sin memoria. |
+| + | calculadora() | CalculadoraHuella | Devuelve `_calculadora`. |
+| + | calcular_en(indice: int) | tuple[Resultado, str] | Resultado del recibo y texto de recomendación. |
+| + | comparar() | str | Pide a la vivienda la comparación contra 334 kWh. |
+| + | describir_resultados() | str | El informe en texto plano. |
+| + | descripcion_vivienda_actual() | str | Dirección registrada, o ninguna. |
+| + | exigir_vivienda() | Vivienda | Error si todavía no hay vivienda. |
+| - | _factor | FactorEmision | Composición. Uno para toda la sesión. |
+| + | factor() | FactorEmision | Devuelve `_factor`. |
+| + | __init__() | — | Crea factor y calculadora. Aún no hay vivienda. |
+| - | _lineas_recomendacion(texto: str) | tuple[LineaInforme, ...] | Parte la recomendación en título y viñetas. |
+| + | lineas_resultados() | tuple[LineaInforme, ...] | Informe de cada recibo, con rol por línea. |
+| - | _personas | list[Persona] | Composición. La sesión crea a los habitantes. |
+| + | personas() | tuple[Persona, ...] | Devuelve la lista de habitantes. |
+| + | quitar_consumo(indice: int) | None | Quita el recibo de esa posición. |
 | + | quitar_habitante(indice: int) | None | La quita de la vivienda y de la lista de la sesión. |
 | + | registrar_consumo(kwh, bimestre, anio) | ConsumoElectrico | Crea el recibo y se lo entrega a la vivienda. |
-| + | quitar_consumo(indice: int) | None | |
-| + | calcular_en(indice: int) | tuple[Resultado, str] | Resultado del recibo y texto de recomendación. |
-| + | lineas_resultados() | tuple[LineaInforme, ...] | Informe de cada recibo, con rol por línea. |
-| - | _lineas_recomendacion(texto: str) | tuple[LineaInforme, ...] | Parte la recomendación en título y viñetas. |
-| + | describir_resultados() | str | El informe en texto plano. |
-| + | comparar() | str | Pide a la vivienda la comparación contra 334 kWh. |
+| + | registrar_vivienda(direccion: str) | bool | True si reemplazó a otra. Valida la dirección antes de borrar lo ya capturado. |
 | + | resumen_contexto() | str | Vivienda, habitantes y cantidad de recibos. |
-| + | descripcion_vivienda_actual() | str | Dirección registrada, o ninguna. |
+| - | _vivienda | Vivienda o None | Composición. None hasta el primer registro. |
+| + | vivienda() | Vivienda o None | Devuelve `_vivienda`. |
 
 Relaciones: compone `Vivienda`, `Persona`, `FactorEmision` y `CalculadoraHuella`. Crea `ConsumoElectrico` y lo cede a la vivienda. Produce `LineaInforme`.
 
