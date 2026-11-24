@@ -1,6 +1,6 @@
 # Diccionario de clases
 
-Catálogo de las 24 clases de EcoHuella. Cada ficha dice para qué existe la clase, qué guarda, qué sabe hacer y con qué otras clases se relaciona.
+Catálogo de las clases del modelo. Cada ficha dice para qué existe la clase, qué guarda, qué sabe hacer y con qué otras clases se relaciona. Las clases de Tkinter no entran: son la ventana, no el problema.
 
 Visibilidad: `+` público, `-` privado (el nombre empieza con `_`). En Python el guion bajo es una convención: desde fuera se usan las propiedades y los métodos públicos.
 
@@ -24,25 +24,10 @@ Tipos de relación:
 | FactorEmision | factor_emision.py | kg CO2e por cada kWh, y el año del factor. | Composición de Sesion. |
 | CalculadoraHuella | calculadora_huella.py | Calcula Ci y HC. No guarda datos. | Depende de vivienda, recibo y factor. Crea Resultado. |
 | Resultado | resultado.py | Copia del cálculo para mostrarlo. | Compone un Bimestre. Produce LineaInforme. |
-| LineaInforme | resultado.py | Una línea del informe y su rol visual. | La producen Resultado y Sesion. La lee CajaResultados. |
-| Sesion | sesion.py | Estado de la ventana: vivienda, personas, factor y cálculo. | Compone vivienda, personas, factor y calculadora. |
-| Tabla | ecohuella.py | Lista con encabezados. | Hereda de tk.Frame. |
-| CajaTexto | ecohuella.py | Texto de solo lectura. | Hereda de tk.Frame. |
-| CajaResultados | ecohuella.py | La misma caja, con las cifras resaltadas. | Hereda de CajaTexto. |
-| ValidadorEntrada | ecohuella.py | Convierte el texto del formulario en números y bimestre. | Depende de Bimestre. |
-| Encabezado | ecohuella.py | Título y barra de contexto. | Hereda de tk.Frame. |
-| BarraEstado | ecohuella.py | Aviso de la última acción. | Hereda de tk.Label. |
-| MenuLateral | ecohuella.py | Botones que cambian de pantalla. | Hereda de tk.Frame. Asocia la acción de Aplicacion. |
-| PanelSeccion | ecohuella.py | Base de las pantallas del menú. | Hereda de tk.Frame. Asocia Aplicacion. |
-| PanelVivienda | ecohuella.py | Formulario de la dirección. | Hereda de PanelSeccion. |
-| PanelHabitantes | ecohuella.py | Alta y baja de habitantes. | Hereda de PanelSeccion. |
-| PanelConsumo | ecohuella.py | Alta y baja del recibo bimestral. | Hereda de PanelSeccion. |
-| PanelCalcular | ecohuella.py | Cálculo de un recibo elegido. | Hereda de PanelSeccion. |
-| PanelResultados | ecohuella.py | Huella de todos los recibos, resaltada. | Hereda de PanelSeccion. Compone CajaResultados. |
-| PanelComparar | ecohuella.py | Diferencia entre recibos y el promedio. | Hereda de PanelSeccion. |
-| Aplicacion | ecohuella.py | Ventana principal. | Hereda de tk.Tk. Compone Sesion y los paneles. |
+| LineaInforme | resultado.py | Una línea del informe y su rol. | La producen Resultado y Sesion. |
+| Sesion | sesion.py | Estado en memoria: vivienda, personas, factor y cálculo. | Compone vivienda, personas, factor y calculadora. |
 
-En el dominio no hay herencia. Todos los habitantes cuentan igual en N, así que `Persona` no tiene subclases. La herencia está en la ventana.
+En el modelo no hay herencia. Todos los habitantes cuentan igual en N, así que `Persona` no tiene subclases.
 
 ---
 
@@ -198,7 +183,7 @@ Una línea del informe y el papel que cumple al pintarla. El rol decide el resal
 | + | texto() | str | |
 | + | rol() | str | |
 
-Relación: la crean `Resultado.partes` y `Sesion`. `CajaResultados` la lee y no la posee.
+Relación: la crean `Resultado.partes` y `Sesion`. La ventana solo la lee para pintar.
 
 ### Sesion
 
@@ -231,210 +216,4 @@ Dueña del estado mientras la ventana está abierta. No escribe archivos.
 
 Relaciones: compone `Vivienda`, `Persona`, `FactorEmision` y `CalculadoraHuella`. Crea `ConsumoElectrico` y lo cede a la vivienda. Produce `LineaInforme`.
 
----
-
-## Ventana
-
-Estas clases heredan de Tkinter. Su trabajo es leer el formulario y llamar a `Sesion`.
-
-### Tabla
-
-Lista con encabezados. La fila `i` es el elemento `i` de habitantes o de recibos.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | arbol | ttk.Treeview | La tabla visible. |
-| + | __init__(parent, columnas, encabezados, altura) | — | Hereda de tk.Frame. |
-| + | vaciar() | None | Borra las filas. |
-| + | llenar(filas) | None | Vuelve a cargar las filas. |
-| + | indice_seleccionado() | int o None | Fila marcada. |
-
-Herencia: `tk.Frame`. Dependencia: muestra colecciones de `Vivienda`.
-
-### CajaTexto
-
-Texto de solo lectura para el cálculo y la comparación.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | texto | tk.Text | Widget de texto. |
-| + | __init__(parent, altura: int) | — | Hereda de tk.Frame. |
-| + | poner(texto: str) | None | Sustituye el contenido. |
-| + | contenido() | str | Texto actual, sin espacios sobrantes. |
-
-Herencia: `tk.Frame`. `CajaResultados` hereda de esta clase.
-
-### CajaResultados
-
-La caja del módulo Consultar resultados individuales. Pinta cada rol de `LineaInforme`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | __init__(parent, altura: int) | — | Configura los estilos al crearse. |
-| - | _configurar_estilos() | None | Verde para las huellas, ámbar para cada habitante, franja verde para el recibo. |
-| + | mostrar_informe(lineas) | None | Escribe cada línea con el estilo de su rol. |
-
-Herencia: `CajaTexto`. Dependencia: lee `LineaInforme` y no la guarda.
-
-### ValidadorEntrada
-
-Convierte lo escrito en el formulario. No pinta nada y no guarda estado. Sus métodos son de clase, porque no necesitan un objeto propio.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | entero(texto, etiqueta) | int | Error si el campo está vacío o no es entero. |
-| + | kwh(texto) | float | Acepta coma o punto. |
-| + | bimestre(texto) | Bimestre | Error si no hay un bimestre elegido. |
-
-Dependencia: crea un `Bimestre` a partir del texto.
-
-### Encabezado
-
-Título de la ventana y resumen de la sesión.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| - | _lbl_contexto | tk.Label | Vivienda, habitantes y recibos. |
-| + | __init__(master, texto_factor: str) | — | Hereda de tk.Frame. Muestra FE y el promedio de 334 kWh. |
-| + | actualizar_contexto(texto: str) | None | Cambia la barra de contexto. |
-
-Herencia: `tk.Frame`. El texto le llega de `Sesion.resumen_contexto`.
-
-### BarraEstado
-
-Mensaje de la última acción.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | __init__(master) | — | Hereda de tk.Label. Empieza en «Listo.» |
-| + | avisar(texto: str, error=False) | None | Verde si salió bien, rojo si hubo error. |
-
-Herencia: `tk.Label`.
-
-### MenuLateral
-
-Botones del menú.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| - | _al_elegir | función | Al pulsar, llama a `Aplicacion.mostrar`. |
-| - | _botones | dict[str, tk.Button] | Un botón por pantalla. |
-| + | __init__(master, entradas, al_elegir, al_salir) | — | Hereda de tk.Frame. Incluye Salir. |
-| + | marcar(clave: str) | None | Deja activa la pantalla elegida. |
-| + | etiquetas() | tuple[str, ...] | Textos de los botones. |
-
-Herencia: `tk.Frame`. Asociación: la acción pertenece a `Aplicacion`.
-
-### PanelSeccion
-
-Base de las seis pantallas. Concentra título, campos y botones.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | clave | str | Identificador: vivienda, habitantes, consumo, calcular, resultados o comparar. |
-| + | etiqueta_menu | str | Texto del botón. Cada subclase pone el suyo. |
-| + | app | Aplicacion | Asociación. El panel llama a la sesión a través de la ventana. |
-| + | __init__(master, app) | — | Hereda de tk.Frame y llama a `construir`. |
-| + | construir() | None | La subclase arma su formulario. |
-| + | refrescar() | None | La subclase vuelve a leer la sesión. |
-| + | titulo(titulo, subtitulo) | None | |
-| + | fila(parent, fila, etiqueta, variable, ancho=36) | tk.Entry | Campo de texto. |
-| + | boton(parent, texto, comando, primario=True) | tk.Button | |
-
-Herencia: `tk.Frame`. Asociación 1 con `Aplicacion`.
-
-### PanelVivienda
-
-Registrar la dirección. Hereda de `PanelSeccion`. Clave `vivienda`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | var_direccion | tk.StringVar | Texto que se convertirá en `Vivienda.direccion`. |
-| + | lbl_actual | tk.Label | Dirección ya registrada. |
-| + | construir() | None | Arma el formulario. |
-| + | refrescar() | None | Muestra la vivienda actual. |
-| - | _registrar() | None | Llama a `Sesion.registrar_vivienda`. |
-
-### PanelHabitantes
-
-Alta y baja de habitantes. Hereda de `PanelSeccion`. Clave `habitantes`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | var_nombre, var_edad, var_identificacion | tk.StringVar | Datos de la nueva `Persona`. |
-| + | lbl_total | tk.Label | Muestra N. |
-| + | tabla | Tabla | Lista de habitantes. |
-| + | construir() | None | |
-| + | refrescar() | None | Vuelve a llenar la tabla desde la vivienda. |
-| - | _agregar() | None | Crea la persona en la sesión. |
-| - | _quitar() | None | Quita la fila seleccionada. |
-
-### PanelConsumo
-
-Captura del recibo bimestral. Hereda de `PanelSeccion`. Clave `consumo`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | var_kwh, var_bimestre, var_anio | tk.StringVar | kWh, bimestre y año del recibo. |
-| + | combo | ttk.Combobox | Los seis bimestres. |
-| + | tabla | Tabla | Recibos ya registrados. |
-| + | construir() | None | |
-| + | refrescar() | None | |
-| - | _registrar() | None | Valida y llama a `Sesion.registrar_consumo`. |
-| - | _quitar() | None | Quita el recibo seleccionado. |
-
-### PanelCalcular
-
-Calcula un recibo elegido. Hereda de `PanelSeccion`. Clave `calcular`. El texto sale plano, sin el resalte del otro módulo.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | tabla | Tabla | Recibos disponibles. |
-| + | caja | CajaTexto | Resultado y recomendación. |
-| + | construir() | None | |
-| + | refrescar() | None | Actualiza la lista, no el texto ya calculado. |
-| + | limpiar() | None | Vuelve al mensaje de seleccionar un recibo. |
-| - | _calcular() | None | Llama a `Sesion.calcular_en`. |
-
-### PanelResultados
-
-Huella de cada recibo. Hereda de `PanelSeccion`. Clave `resultados`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | caja | CajaResultados | Composición. Aquí se resaltan las cifras. |
-| + | construir() | None | |
-| + | refrescar() | None | Pide `Sesion.lineas_resultados` y las manda a la caja. |
-
-### PanelComparar
-
-Diferencia entre recibos y el promedio de 334 kWh. Hereda de `PanelSeccion`. Clave `comparar`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | caja | CajaTexto | Texto de la comparación. |
-| + | construir() | None | |
-| + | refrescar() | None | Pide `Sesion.comparar`. |
-
-### Aplicacion
-
-Ventana principal. Hereda de `tk.Tk`. No calcula: delega en `Sesion`.
-
-| Visibilidad | Miembro | Tipo | Descripción |
-| --- | --- | --- | --- |
-| + | PANELES | tuple de clases | Las seis pantallas, en el orden del menú. |
-| + | sesion | Sesion | Composición. Estado del programa. |
-| - | _paneles | dict[str, PanelSeccion] | Composición. Una instancia de cada pantalla. |
-| + | encabezado | Encabezado | Composición. |
-| + | menu | MenuLateral | Composición. |
-| + | contenido | tk.Frame | Zona donde se apilan los paneles. |
-| + | estado | BarraEstado | Composición. |
-| + | __init__() | — | Crea la sesión, el menú y las pantallas. |
-| - | _configurar_estilo() | None | Fuentes y colores de las tablas. |
-| - | _construir_interfaz() | None | Arma encabezado, menú, paneles y barra. |
-| + | panel(clave: str) | PanelSeccion | Devuelve una pantalla. |
-| + | mostrar(clave: str) | None | Trae la pantalla al frente y la refresca. |
-| + | avisar(texto, error=False) | None | Escribe en la barra de estado. |
-| + | sincronizar(limpiar_calculo=False) | None | Actualiza contexto y listas. |
-
-La función `main()`, en `ecohuella.py`, solo crea una `Aplicacion` y abre el ciclo de la ventana. Es el único código que no está dentro de una clase.
+La ventana sigue hecha con clases (`Aplicacion`, paneles, tablas y cajas) que heredan de Tkinter. No forman parte de este diccionario: no representan la vivienda, el recibo ni la huella. Solo capturan datos y muestran lo que ya calcula `Sesion`.
