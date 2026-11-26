@@ -38,6 +38,24 @@ Orden de uso: vivienda, habitantes, datos del recibo (kWh del bimestre y año) y
 
 En Consultar resultados individuales las cifras van resaltadas: fondo verde para el consumo individual y las huellas, fondo ámbar para el resultado de cada habitante, y una franja verde con el bimestre del recibo.
 
+## Guía de uso en Windows
+
+1. Instala Python 3 desde [python.org](https://www.python.org/downloads/). En el instalador marca **Add python.exe to PATH**. Tkinter viene incluido con ese instalador; no hace falta instalarlo aparte.
+2. Ten el archivo .zip del proyecto. Haz clic derecho sobre él, elige **Extraer todo** y abre la carpeta extraída que contiene `ecohuella.py`.
+3. Abre **cmd** en la carpeta del proyecto (la que contiene `ecohuella.py`) y ejecuta:
+
+```bat
+python ecohuella.py
+```
+
+4. Si cmd responde que `python` no se reconoce como comando, usa el lanzador de Python:
+
+```bat
+py ecohuella.py
+```
+
+5. En la ventana, registra la vivienda, después los habitantes y el recibo (kWh del bimestre y año). Calcula la huella y, si quieres, consulta los resultados de cada recibo o compara los bimestres. Los datos solo duran mientras la ventana está abierta.
+
 ## Fórmulas
 
 - Consumo individual del bimestre: `Ci = Ct / N`
@@ -46,18 +64,20 @@ En Consultar resultados individuales las cifras van resaltadas: fondo verde para
 
 `Ct` es el consumo del recibo, en kWh, ya sumado los dos meses. `N` es el número de habitantes y `FE` el factor de emisión.
 
-FE por defecto: **0.444 kg CO2e/kWh** (México, 2024), en `factor_emision.py`. El método `actualizar` de `FactorEmision` permite cambiarlo.
+FE por defecto: **0.444 kg CO2e/kWh** (0.444 tCO2e/MWh, factor del Sistema Eléctrico Nacional 2024 publicado por SEMARNAT el 28 de febrero de 2025; sigue siendo el más reciente), en `factor_emision.py`. El método `actualizar` de `FactorEmision` permite cambiarlo.
 
 Si `N` es 0 o los kWh no son válidos (cero, negativos o no numéricos), el programa no divide y muestra el motivo en la barra de estado.
 
 ## Recomendaciones
 
-Al calcular y al consultar resultados, el kWh del recibo se compara con **334 kWh por bimestre**.
+Al calcular y al consultar resultados, el kWh del recibo se compara con **309.71 kWh por bimestre**.
 
-Esa cifra sale del uso residencial aproximado en México: unos **167 kWh/mes**, equivalentes a **2000 kWh al año** (`2000 / 12` da cerca de 167). El recibo cubre dos meses, así que `167 * 2 = 334`. La constante mensual está comentada en `calculadora_huella.py` y los meses del bimestre viven en `Bimestre.MESES`.
+Esa cifra sale del consumo promedio por vivienda en México: **1858.24 kWh al año** (CONUEE, Base de Indicadores de Eficiencia Energética, dato 2019 publicado por SEMARNAT). `1858.24 / 12` da **154.85 kWh/mes** y el recibo cubre dos meses, así que `154.85 * 2 = 309.71`.
 
-- Si el recibo supera 334 kWh, se recomiendan iluminación LED, menos aire acondicionado, cortar el standby, cuidar los horarios y electrodomésticos eficientes.
-- Si está en 334 kWh o por debajo, se refuerzan esos hábitos.
+También se muestra la **huella promedio por persona**: `(309.71 / 3.6) * 0.444 = 38.20 kg CO2e por bimestre`, con 3.6 ocupantes por vivienda (INEGI, Censo 2020). La huella promedio de una vivienda es `309.71 * 0.444 = 137.51 kg CO2e por bimestre`. La constante mensual está comentada en `calculadora_huella.py` y los meses del bimestre viven en `Bimestre.MESES`.
+
+- Si el recibo supera 309.71 kWh, se recomiendan iluminación LED, menos aire acondicionado, cortar el standby, cuidar los horarios y electrodomésticos eficientes.
+- Si está en 309.71 kWh o por debajo, se refuerzan esos hábitos.
 
 ## Clases
 
@@ -79,3 +99,9 @@ Esa cifra sale del uso residencial aproximado en México: unos **167 kWh/mes**, 
 En el dominio no hay subclases. No existe un tipo de habitante con un comportamiento distinto que justifique heredar de `Persona`.
 
 En la ventana sí: `PanelVivienda`, `PanelHabitantes`, `PanelConsumo`, `PanelCalcular`, `PanelResultados` y `PanelComparar` heredan de `PanelSeccion`, que concentra título, campos y botones. `CajaResultados` hereda de `CajaTexto`. `Tabla`, `Encabezado`, `MenuLateral` y `BarraEstado` son componentes propios y, como el resto de la ventana, heredan de los widgets de Tkinter.
+
+## Fuentes
+
+- SEMARNAT. (2025, 28 de febrero). *Aviso: Factor de emisión del Sistema Eléctrico Nacional 2024*. https://www.gob.mx/cms/uploads/attachment/file/981194/aviso_fesen_2024.pdf
+- SEMARNAT. (2021). *Compendio de Estadísticas Ambientales 2021: Intensidad y consumo de electricidad (BIEE-CONUEE)*. https://apps1.semarnat.gob.mx:8443/dgeia/compendio_2021/dgeiawf.semarnat.gob.mx_8080/ibi_apps/WFServletc953.html
+- INEGI. (2023). *Estadísticas a propósito del Día Nacional de la Vivienda*. https://www.inegi.org.mx/contenidos/saladeprensa/aproposito/2023/EAP_Vivienda.pdf

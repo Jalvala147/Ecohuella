@@ -122,7 +122,7 @@ Relación: composición de `Vivienda`. Compone un `Bimestre`. `CalculadoraHuella
 
 ### FactorEmision
 
-Kilogramos de CO2e por cada kWh. El valor inicial es 0.444, México 2024.
+Kilogramos de CO2e por cada kWh. El valor inicial es 0.444, factor del Sistema Eléctrico Nacional 2024 (SEMARNAT, aviso del 28 de febrero de 2025), el más reciente publicado.
 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
@@ -142,9 +142,10 @@ Hace `Ci = Ct / N` y `HC = Ci * FE`. Ct es el kWh del recibo. No divide si N es 
 | Visibilidad | Miembro | Tipo | Descripción |
 | --- | --- | --- | --- |
 | + | calcular(vivienda, consumo, factor) | Resultado | Crea el resultado del recibo. |
-| + | promedio_bimestral_kwh() | float | 167 × `Bimestre.MESES`, o sea 334 kWh por recibo. |
-| + | promedio_residencial_kwh() | float | 167 kWh/mes. |
-| + | recomendar(resultado: Resultado) | str | Hábitos según el recibo esté sobre o bajo 334 kWh. |
+| + | huella_promedio_persona_kg(factor: float) | float | (309.71 / 3.6 ocupantes) × FE: 38.20 kg CO2e por persona y bimestre con FE 0.444. |
+| + | promedio_bimestral_kwh() | float | 154.85 × `Bimestre.MESES`, o sea 309.71 kWh por recibo. |
+| + | promedio_residencial_kwh() | float | 1858.24 / 12 = 154.85 kWh/mes (CONUEE, BIEE 2019). |
+| + | recomendar(resultado: Resultado) | str | Hábitos según el recibo esté sobre o bajo 309.71 kWh, y la huella individual frente a la promedio. |
 
 Relaciones: depende de `Vivienda`, `ConsumoElectrico`, `FactorEmision` y `Bimestre`. Crea un `Resultado` y no lo almacena.
 
@@ -215,7 +216,7 @@ Dueña del estado mientras la ventana está abierta. No escribe archivos.
 | - | _calculadora | CalculadoraHuella | Composición. Servicio sin memoria. |
 | + | calculadora() | CalculadoraHuella | Devuelve `_calculadora`. |
 | + | calcular_en(indice: int) | tuple[Resultado, str] | Resultado del recibo y texto de recomendación. |
-| + | comparar() | str | Pide a la vivienda la comparación contra 334 kWh. |
+| + | comparar() | str | Pide a la vivienda la comparación contra 309.71 kWh. |
 | + | describir_resultados() | str | El informe en texto plano. |
 | + | descripcion_vivienda_actual() | str | Dirección registrada, o ninguna. |
 | + | exigir_vivienda() | Vivienda | Error si todavía no hay vivienda. |
